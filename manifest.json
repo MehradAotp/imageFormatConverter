@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Image Format Converter",
+  "version": "1.0.0",
+  "description": "Convert images from any webpage to PNG, WebP, or JPG from the context menu.",
+  "permissions": ["contextMenus", "downloads", "storage", "notifications"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "options_page": "options.html",
+  "action": {
+    "default_title": "Image Format Converter"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
