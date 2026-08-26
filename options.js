@@ -1,32 +1,8 @@
-const defaults = { webpQuality: 0.92, jpgQuality: 0.9, filenameMode: 'original' };
-const webpQuality = document.querySelector('#webpQuality');
-const jpgQuality = document.querySelector('#jpgQuality');
-const filenameMode = document.querySelector('#filenameMode');
-const status = document.querySelector('#status');
-
-function updateLabels() {
-  document.querySelector('#webpQualityValue').textContent = `${Math.round(Number(webpQuality.value) * 100)}%`;
-  document.querySelector('#jpgQualityValue').textContent = `${Math.round(Number(jpgQuality.value) * 100)}%`;
-}
-
-async function load() {
-  const settings = await chrome.storage.local.get(defaults);
-  webpQuality.value = settings.webpQuality;
-  jpgQuality.value = settings.jpgQuality;
-  filenameMode.value = settings.filenameMode;
-  updateLabels();
-}
-
-webpQuality.addEventListener('input', updateLabels);
-jpgQuality.addEventListener('input', updateLabels);
-document.querySelector('#save').addEventListener('click', async () => {
-  await chrome.storage.local.set({
-    webpQuality: Number(webpQuality.value),
-    jpgQuality: Number(jpgQuality.value),
-    filenameMode: filenameMode.value
-  });
-  status.textContent = 'Settings saved.';
-  setTimeout(() => { status.textContent = ''; }, 2200);
-});
-
+const defaults={webpQuality:.92,jpgQuality:.9,avifQuality:.8,filenameMode:'original',maxWidth:0,maxHeight:0,jpegBackground:'#ffffff'};
+const ids=['webpQuality','jpgQuality','avifQuality','filenameMode','maxWidth','maxHeight','jpegBackground'];
+const $=(id)=>document.querySelector(`#${id}`);
+function labels(){for(const id of ['webpQuality','jpgQuality','avifQuality']) $(`${id}Value`).textContent=`${Math.round(Number($(id).value)*100)}%`;}
+async function load(){const s=await chrome.storage.local.get(defaults);for(const id of ids) $(id).value=s[id];labels();}
+for(const id of ['webpQuality','jpgQuality','avifQuality']) $(id).addEventListener('input',labels);
+$('save').addEventListener('click',async()=>{await chrome.storage.local.set({webpQuality:Number($('webpQuality').value),jpgQuality:Number($('jpgQuality').value),avifQuality:Number($('avifQuality').value),filenameMode:$('filenameMode').value,maxWidth:Number($('maxWidth').value)||0,maxHeight:Number($('maxHeight').value)||0,jpegBackground:$('jpegBackground').value});$('status').textContent='Preferences saved.';setTimeout(()=>$('status').textContent='',2200);});
 load();

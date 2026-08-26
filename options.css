@@ -1,18 +1,1 @@
-:root {
-  color-scheme: dark;
-  font-family: Inter, system-ui, sans-serif;
-  background: #111827;
-  color: #f9fafb;
-}
-
-body { margin: 0; min-width: 320px; }
-.card { max-width: 620px; margin: 48px auto; padding: 32px; background: #1f2937; border: 1px solid #374151; border-radius: 18px; box-shadow: 0 20px 60px #0004; }
-h1 { margin: 0 0 8px; font-size: 28px; }
-.intro { margin: 0 0 28px; color: #9ca3af; }
-label { display: block; margin: 22px 0; font-weight: 650; }
-output { float: right; color: #93c5fd; }
-input, select { display: block; width: 100%; margin-top: 10px; box-sizing: border-box; }
-select { padding: 11px; border-radius: 8px; border: 1px solid #4b5563; background: #111827; color: inherit; }
-button { margin-top: 8px; padding: 11px 18px; border: 0; border-radius: 9px; background: #2563eb; color: white; font-weight: 700; cursor: pointer; }
-button:hover { background: #3b82f6; }
-#status { min-height: 1.4em; color: #86efac; }
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#020617;color:#f8fafc}body{margin:0;padding:30px 16px}.card{max-width:680px;margin:auto;padding:34px;background:linear-gradient(145deg,#1e293b,#111827);border:1px solid #334155;border-radius:22px;box-shadow:0 24px 70px #0008}.eyebrow{letter-spacing:.14em;color:#60a5fa;font-size:11px;font-weight:800}h1{font-size:32px;margin:8px 0}.intro,.hint{color:#94a3b8;line-height:1.6}section{padding:20px 0;border-top:1px solid #334155}h2{font-size:16px;margin:0 0 18px}label{display:block;margin:18px 0;font-weight:650}output{float:right;color:#93c5fd}input,select{display:block;width:100%;margin-top:9px;padding:10px;box-sizing:border-box;border:1px solid #475569;border-radius:8px;background:#0f172a;color:inherit}input[type=range]{padding:0;accent-color:#3b82f6}input[type=color]{height:42px;padding:4px}.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.row label{margin:0}button{margin-top:4px;padding:12px 20px;border:0;border-radius:9px;background:#2563eb;color:white;font-weight:750;cursor:pointer}button:hover{background:#3b82f6}#status{min-height:1.4em;color:#86efac}@media(max-width:520px){.card{padding:24px}.row{grid-template-columns:1fr}}

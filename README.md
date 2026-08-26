@@ -1,6 +1,16 @@
-# Image Format Converter
+# Image Converter Pro
 
-A Manifest V3 Chrome extension that converts any accessible webpage image to PNG, WebP, or JPG from the right-click menu.
+A privacy-first Chrome Manifest V3 toolbox for converting, resizing, and batch-exporting web images.
+
+## Features
+
+- Right-click conversion to PNG, JPG, WebP, AVIF, BMP, or TIFF (browser support varies).
+- Page dashboard that discovers images, previews them, and exports selected images in batches.
+- High-quality resizing with aspect ratio preservation.
+- Configurable WebP, JPG, and AVIF quality.
+- Custom JPG background color for transparent images.
+- Original filename or timestamp naming.
+- All processing happens locally in the browser.
 
 ## Install locally
 
@@ -11,18 +21,10 @@ A Manifest V3 Chrome extension that converts any accessible webpage image to PNG
 
 ## Use
 
-Right-click an image, choose **Convert image to…**, then select PNG, WebP, or JPG. The converted file is generated locally and downloaded through Chrome.
+Right-click an image and select **Image Converter Pro → Convert to…**. To process a page, right-click anywhere and choose **Open page image dashboard**, or open the extension popup and click **Scan this page**.
 
-Open the extension details and choose **Extension options** to configure WebP/JPG quality and filename behavior.
+Open **Extension options** for quality, resize, naming, and JPG background preferences.
 
 ## Limitations
 
-Some sites block cross-origin image requests, require authentication that is unavailable to the extension, or use protected/canvas-hostile resources. Those images may not be convertible. Chrome internal pages such as `chrome://` are not scriptable.
-
-## Permissions
-
-- `contextMenus`: adds the image conversion menu.
-- `downloads`: saves the converted file.
-- `storage`: stores quality and filename preferences.
-- `notifications`: reports conversion errors.
-- `<all_urls>`: lets the extension fetch images from arbitrary webpages.
+AVIF, BMP, and TIFF encoding depends on browser canvas support; unsupported MIME types may fail. Cross-origin restrictions, authentication, protected resources, and Chrome internal pages can prevent conversion. Batch exports use Chrome's native download manager.
