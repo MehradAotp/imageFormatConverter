@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Image Format Converter Pro",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "مبدل حرفه‌ای تصاویر وب؛ طراحی و توسعه توسط MrAOTP.",
   "permissions": ["contextMenus", "downloads", "storage", "notifications", "activeTab", "scripting"],
   "host_permissions": ["<all_urls>"],
