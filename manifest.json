@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Image Format Converter Pro",
   "version": "2.0.0",
-  "description": "A privacy-first professional image toolbox for converting, compressing, and batch-exporting web images.",
+  "description": "مبدل حرفه‌ای تصاویر وب؛ طراحی و توسعه توسط MrAOTP.",
   "permissions": ["contextMenus", "downloads", "storage", "notifications", "activeTab", "scripting"],
   "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "background.js", "type": "module" },

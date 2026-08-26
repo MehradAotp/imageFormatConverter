@@ -24,11 +24,11 @@ chrome.runtime.onStartup.addListener(createMenus);
 
 async function createMenus() {
   await chrome.contextMenus.removeAll();
-  chrome.contextMenus.create({ id: MENU_ID, title: 'Image Converter Pro', contexts: ['image'] });
+  chrome.contextMenus.create({ id: MENU_ID, title: 'مبدل تصویر پرو · MrAOTP', contexts: ['image'] });
   for (const [id, title] of QUICK_FORMATS) {
-    chrome.contextMenus.create({ id: `convert-${id}`, parentId: MENU_ID, title: `Convert to ${title}`, contexts: ['image'] });
+    chrome.contextMenus.create({ id: `convert-${id}`, parentId: MENU_ID, title: `تبدیل به ${title}`, contexts: ['image'] });
   }
-  chrome.contextMenus.create({ id: 'open-dashboard', parentId: MENU_ID, title: 'Open page image dashboard', contexts: ['image', 'page'] });
+  chrome.contextMenus.create({ id: 'open-dashboard', parentId: MENU_ID, title: 'باز کردن داشبورد تصاویر صفحه', contexts: ['image', 'page'] });
 }
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
@@ -57,4 +57,4 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 function sanitize(value) { return value.replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').trim() || 'image'; }
-async function notify(message) { await chrome.notifications.create({ type: 'basic', iconUrl: 'icons/icon128.png', title: 'Image Converter Pro', message }); }
+async function notify(message) { await chrome.notifications.create({ type: 'basic', iconUrl: 'icons/icon128.png', title: 'مبدل تصویر پرو · MrAOTP', message }); }
