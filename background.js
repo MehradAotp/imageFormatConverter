@@ -1,60 +1,16 @@
 const MENU_ID = 'image-converter-root';
-const QUICK_FORMATS = [
-  ['png', 'PNG'],
-  ['jpg', 'JPG'],
-  ['webp', 'WebP'],
-  ['avif', 'AVIF'],
-  ['bmp', 'BMP'],
-  ['tiff', 'TIFF']
-];
-
-chrome.runtime.onInstalled.addListener(async () => {
-  await createMenus();
-  await chrome.storage.local.set(await chrome.storage.local.get({
-    webpQuality: 0.92,
-    jpgQuality: 0.9,
-    avifQuality: 0.8,
-    filenameMode: 'original',
-    maxWidth: 0,
-    maxHeight: 0,
-    jpegBackground: '#ffffff'
-  }));
-});
+const QUICK_FORMATS = [['png', 'PNG'], ['jpg', 'JPG'], ['webp', 'WebP'], ['avif', 'AVIF'], ['bmp', 'BMP'], ['tiff', 'TIFF']];
+const DEFAULTS = { webpQuality: 0.92, jpgQuality: 0.9, avifQuality: 0.8, filenameMode: 'original', maxWidth: 0, maxHeight: 0, jpegBackground: '#ffffff', targetKB: 0 };
+chrome.runtime.onInstalled.addListener(async () => { await createMenus(); await chrome.storage.local.set(await chrome.storage.local.get(DEFAULTS)); });
 chrome.runtime.onStartup.addListener(createMenus);
-
-async function createMenus() {
-  await chrome.contextMenus.removeAll();
-  chrome.contextMenus.create({ id: MENU_ID, title: 'مبدل تصویر پرو · MrAOTP', contexts: ['image'] });
-  for (const [id, title] of QUICK_FORMATS) {
-    chrome.contextMenus.create({ id: `convert-${id}`, parentId: MENU_ID, title: `تبدیل به ${title}`, contexts: ['image'] });
-  }
-  chrome.contextMenus.create({ id: 'open-dashboard', parentId: MENU_ID, title: 'باز کردن داشبورد تصاویر صفحه', contexts: ['image', 'page'] });
-}
-
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (!tab?.id) return;
-  if (info.menuItemId === 'open-dashboard') {
-    await chrome.tabs.sendMessage(tab.id, { type: 'OPEN_DASHBOARD' });
-    return;
-  }
-  const format = String(info.menuItemId).replace('convert-', '');
-  if (!info.srcUrl || !QUICK_FORMATS.some(([id]) => id === format)) return;
-  try {
-    const response = await chrome.tabs.sendMessage(tab.id, { type: 'CONVERT_IMAGE', srcUrl: info.srcUrl, format });
-    if (!response?.dataUrl) throw new Error(response?.error || 'Conversion failed.');
-    await chrome.downloads.download({ url: response.dataUrl, filename: `${sanitize(response.filename || 'image')}.${format === 'jpg' ? 'jpg' : format}`, saveAs: true });
-  } catch (error) {
-    await notify(error instanceof Error ? error.message : 'The image could not be converted.');
-  }
-});
-
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type !== 'DOWNLOAD_BATCH') return;
-  Promise.all(message.files.map(async (file) => chrome.downloads.download({ url: file.dataUrl, filename: file.filename, saveAs: false })))
-    .then(() => sendResponse({ ok: true }))
-    .catch((error) => sendResponse({ ok: false, error: error.message }));
-  return true;
-});
-
+async function createMenus() { await chrome.contextMenus.removeAll(); chrome.contextMenus.create({ id: MENU_ID, title: 'مبدل تصویر پرو · MrAOTP', contexts: ['image'] }); for (const [id, title] of QUICK_FORMATS) chrome.contextMenus.create({ id: `convert-${id}`, parentId: MENU_ID, title: `تبدیل به ${title}`, contexts: ['image'] }); chrome.contextMenus.create({ id: 'open-dashboard', parentId: MENU_ID, title: 'باز کردن داشبورد تصاویر صفحه', contexts: ['image', 'page'] }); }
+chrome.contextMenus.onClicked.addListener(async (info, tab) => { if (!tab?.id) return; if (info.menuItemId === 'open-dashboard') { await chrome.tabs.sendMessage(tab.id, { type: 'OPEN_DASHBOARD' }); return; } const format = String(info.menuItemId).replace('convert-', ''); if (!info.srcUrl || !QUICK_FORMATS.some(([id]) => id === format)) return; try { const response = await chrome.tabs.sendMessage(tab.id, { type: 'CONVERT_IMAGE', srcUrl: info.srcUrl, format }); if (!response?.dataUrl) throw new Error(response?.error || 'تبدیل ناموفق بود.'); await chrome.downloads.download({ url: response.dataUrl, filename: `${sanitize(response.filename || 'image')}.${format}`, saveAs: true }); } catch (error) { await notify(error instanceof Error ? error.message : 'تبدیل تصویر ناموفق بود.'); } });
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => { if (message?.type === 'DOWNLOAD_BATCH') { (async () => { try { const zipUrl = makeZipDataUrl(message.files || []); await chrome.downloads.download({ url: zipUrl, filename: message.zipName || 'mraotp-image-export.zip', saveAs: true }); sendResponse({ ok: true }); } catch (error) { sendResponse({ ok: false, error: error.message }); } })(); return true; } if (message?.type === 'GET_HISTORY') { chrome.storage.local.get({ conversionHistory: [] }).then((data) => sendResponse({ history: data.conversionHistory })); return true; } if (message?.type === 'CLEAR_HISTORY') { chrome.storage.local.set({ conversionHistory: [] }).then(() => sendResponse({ ok: true })); return true; } });
+function makeZipDataUrl(files) { const entries = files.map((file) => { const data = decodeDataUrl(file.dataUrl); return { name: file.filename.replace(/[^a-zA-Z0-9._-]/g, '_'), data }; }); let offset = 0; const locals = [], centrals = []; for (const entry of entries) { const name = textBytes(entry.name), crc = crc32(entry.data), local = new Uint8Array(30 + name.length + entry.data.length); const lv = new DataView(local.buffer); lv.setUint32(0, 0x04034b50, true); lv.setUint16(4, 20, true); lv.setUint16(8, 0, true); lv.setUint16(10, 0, true); lv.setUint32(14, crc, true); lv.setUint32(18, entry.data.length, true); lv.setUint32(22, entry.data.length, true); lv.setUint16(26, name.length, true); local.set(name, 30); local.set(entry.data, 30 + name.length); locals.push(local); const central = new Uint8Array(46 + name.length), cv = new DataView(central.buffer); cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true); cv.setUint32(16, crc, true); cv.setUint32(20, entry.data.length, true); cv.setUint32(24, entry.data.length, true); cv.setUint16(28, name.length, true); cv.setUint32(42, offset, true); central.set(name, 46); centrals.push(central); offset += local.length; } const centralBytes = concat(centrals), localBytes = concat(locals), end = new Uint8Array(22), ev = new DataView(end.buffer); ev.setUint32(0, 0x06054b50, true); ev.setUint16(8, entries.length, true); ev.setUint16(10, entries.length, true); ev.setUint32(12, centralBytes.length, true); ev.setUint32(16, localBytes.length, true); return bufferToDataUrl(concat([localBytes, centralBytes, end]), 'application/zip'); }
+function decodeDataUrl(url) { const binary = atob(url.split(',')[1] || ''); return Uint8Array.from(binary, (char) => char.charCodeAt(0)); }
+function textBytes(text) { return new TextEncoder().encode(text); }
+function concat(parts) { const total = parts.reduce((sum, part) => sum + part.length, 0), out = new Uint8Array(total); let offset = 0; for (const part of parts) { out.set(part, offset); offset += part.length; } return out; }
+function crc32(bytes) { let crc = 0xffffffff; for (const byte of bytes) { crc ^= byte; for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1)); } return (crc ^ 0xffffffff) >>> 0; }
+function bufferToDataUrl(bytes, mime) { let binary = ''; for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000)); return `data:${mime};base64,${btoa(binary)}`; }
 function sanitize(value) { return value.replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').trim() || 'image'; }
 async function notify(message) { await chrome.notifications.create({ type: 'basic', iconUrl: 'icons/icon128.png', title: 'مبدل تصویر پرو · MrAOTP', message }); }
