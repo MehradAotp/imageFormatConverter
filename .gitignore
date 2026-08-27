@@ -1,0 +1,27 @@
+# Freebuff workspace metadata
+.freebuff/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor and IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Build and coverage output
+dist/
+build/
+coverage/
